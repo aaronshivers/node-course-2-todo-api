@@ -1,4 +1,4 @@
-const {MongoClient, ObjectID} = require('mongodb')
+const {MongoClient, ObjectId} = require('mongodb')
 
 MongoClient.connect('mongodb://localhost:27017/TodoApp', { useNewUrlParser: true }, (err, client) => {
 	if (err) {
@@ -33,7 +33,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', { useNewUrlParser: true
 	// })
 
 	// findOneAndDelete
-	// db.collection('Users').findOneAndDelete({_id: new ObjectID('5b8d7ee441c7164ae852c4d4')}).then((result) => {
+	// db.collection('Users').findOneAndDelete({_id: new ObjectId('5b8fdaf428060a1482af11d2')}).then((result) => {
 	// 	console.log(result)
 	// })
 
