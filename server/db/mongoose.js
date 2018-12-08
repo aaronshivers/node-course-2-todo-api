@@ -8,9 +8,6 @@ const pass = process.env.MONGO_PASS
 const encodedpass = encodeURIComponent(pass)
 const url = `mongodb://${user}:${encodedpass}@${server}/${database}`
 
-
-// mongoose.Promise = global.Promise
-
 mongoose.connect(url, {useNewUrlParser: true})
 
 module.exports = { mongoose }
