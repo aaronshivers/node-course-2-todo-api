@@ -19,6 +19,7 @@ beforeEach((done) => {
 	}).then(() => done())
 })
 
+// POST new Todo
 describe('POST /todos', () => {
 	it('should create a new todo', (done) => {
 		const text = 'Test todo text'
@@ -62,6 +63,7 @@ describe('POST /todos', () => {
 	})
 })
 
+// GET all todos
 describe('GET /todos', () => {
 	it('should get all todos', (done) => {
 		request(app)
@@ -74,6 +76,7 @@ describe('GET /todos', () => {
 	})
 })
 
+// GET todo by Id
 describe('GET /todos/:id', () => {
 	it('should return todo doc', (done) => {
 		request(app)
@@ -97,6 +100,44 @@ describe('GET /todos/:id', () => {
 	it('should return 404 for non-object Ids', (done) => {
 		request(app)
 			.get('/todos/fakeId')
+			.expect(404)
+			.end(done)
+	})
+})
+
+// Delete by Id
+describe('DELETE /todos/:id', () => {
+	it('should remove a todo', (done) => {
+		const hexId = todos[1]._id.toHexString()
+
+		request(app)
+			.delete(`/todos/${hexId}`)
+			.expect(200)
+			.expect((res) => {
+				expect(res.body.todo._id).toBe(hexId)
+			})
+			.end((err, res) => {
+				if (err) {
+					return done(err)
+				}
+
+				Todo.findById(hexId).then((todo) => {
+					expect(todo).toBeFalsy()
+					done()
+				}).catch((err) => done(err))
+			})
+	})
+
+	it('should return 404 if todo not found', (done) => {
+		request(app)
+			.delete('/todos/fakeId')
+			.expect(404)
+			.end(done)
+	})
+
+	it('should return 404 if ObjectId is invalid', (done) => {
+		request(app)
+			.delete('/todos/fakeId')
 			.expect(404)
 			.end(done)
 	})
