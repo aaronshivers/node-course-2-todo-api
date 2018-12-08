@@ -1,13 +1,17 @@
 {
-  "name": "todo-api",
+  "name": "node-todo-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "server/server.js",
+  "description": "a todo application",
+  "main": "index.js",
   "scripts": {
+    "start": "node server/server.js",
     "test": "mocha --timeout 5000 server/**/*.test.js",
     "test-watch": "nodemon --exec 'npm test'"
   },
-  "author": "",
+  "engines": {
+    "node": "10.13.0"
+  },
+  "author": "aaron shivers",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^6.2.0",

@@ -1,13 +1,13 @@
 require('dotenv').config()
 
 const	express = require('express')
-const	app = express()
 
 const {ObjectId} = require('mongodb')
 const	{mongoose} = require('./db/mongoose')
 const	{Todo} = require('./models/todo')
 const	{User} = require('./models/user')
-			
+
+const	app = express()	
 const	port = process.env.port || 3000
 
 // App Config
