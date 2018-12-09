@@ -1,9 +1,10 @@
 const validator = require('validator')
-// import {isEmail} from 'validator/lib/isEmail' 
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
+const bcrypt = require('bcrypt')
 // const {Todo}	 = require('../models/todo')
+const saltingRounds = 10
 
 const userSchema = new mongoose.Schema({
 	email: {
@@ -81,6 +82,22 @@ userSchema.statics.findByToken = function (token) {
 		'tokens.access': 'auth'
 	})
 }
+
+userSchema.pre('save', function (next) {
+	const user = this
+	if (user.isModified) {
+		bcrypt.hash(user.password, saltingRounds, (err, hash) => {
+			if (err) {
+				next(err)
+			} else {
+				user.password = hash
+				next()
+			}
+		})
+	} else {
+		next()
+	}
+})
 
 const User = mongoose.model('User', userSchema)
 
