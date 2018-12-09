@@ -52,13 +52,33 @@ userSchema.methods.generateAuthToken = function () {
 	const access = 'auth'
 	const payload = {_id: user._id.toHexString(), access}
 	const secret = process.env.JWT_SECRET
-	const token = jwt.sign(payload, secret).toString()
+	const options = { expiresIn: '2d', issuer: 'https://www.demo.com' }
+	const token = jwt.sign(payload, secret, options).toString()
 
 	user.tokens.push({access, token})
 	// user.tokens = user.tokens.concat([{access, token}])
 
 	return user.save().then(() => {
 		return token
+	})
+}
+
+userSchema.statics.findByToken = function (token) {
+	let User = this
+	let decoded
+		
+	try {
+		const secret = process.env.JWT_SECRET
+		decoded = jwt.verify(token, secret)
+
+	} catch (err) {
+		
+		return Promise.reject()
+	}
+	return User.findOne({
+		'_id': decoded._id,
+		'tokens.token': token,
+		'tokens.access': 'auth'
 	})
 }
 

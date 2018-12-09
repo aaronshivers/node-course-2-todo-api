@@ -3,17 +3,29 @@ require('./config/config')
 
 const _ = require('lodash')
 const	express = require('express')
+const cookieParser = require('cookie-parser')
 
 const {ObjectId} = require('mongodb')
 const	{mongoose} = require('./db/mongoose')
 const	{Todo} = require('./models/todo')
 const	{User} = require('./models/user')
+const {authenticate} = require('./middleware/authenticate')
 
 const	app = express()	
 const	port = process.env.PORT
 
 // App Config
 app.use(express.json())
+app.use(cookieParser())
+
+app.get('/', (req, res) => {
+	res.send(`
+		<h1>Todo Application</h1>
+		<ul>
+			<li><a href="/todos">View Todos</a></li>
+			<li><a href="/users">View Users</a></li>
+		</ul>`)
+})
 
 // Post Todo
 app.post('/todos', (req, res) => {
@@ -110,11 +122,17 @@ app.post('/users', (req, res) => {
 	user.save().then(() => {
 		return user.generateAuthToken()
 	}).then((token) => {
-		// res.header('x-auth', token).send(user)	
-		res.cookie('token', token).send(user)	
+		// res.header('x-auth', token).send(user)
+		res.cookie('token', token).send(user)
+		// console.log(req.cookies.token)
 	}).catch((err) => {
 		res.status(400).send(err)
 	})
+})
+
+// Private route
+app.get('/users/me', authenticate, (req, res) => {
+	res.send(req.user)
 })
 
 // Start Server
