@@ -1,15 +1,17 @@
 require('dotenv').config()
 require('./config/config')
 
-const _ = require('lodash')
+const  _ = require('lodash')
 const  express = require('express')
-const cookieParser = require('cookie-parser')
+const  cookieParser = require('cookie-parser')
+const  bcrypt = require('bcrypt')
+const  jwt = require('jsonwebtoken')
 
-const {ObjectId} = require('mongodb')
+const  {ObjectId} = require('mongodb')
 const  {mongoose} = require('./db/mongoose')
 const  {Todo} = require('./models/todo')
 const  {User} = require('./models/user')
-const {authenticate} = require('./middleware/authenticate')
+const  {authenticate} = require('./middleware/authenticate')
 
 const  app = express()  
 const  port = process.env.PORT
@@ -133,6 +135,19 @@ app.post('/users', (req, res) => {
 // Private route
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user)
+})
+
+// POST /users/login
+app.post('/users/login', (req, res) => {
+  const body = _.pick(req.body, ['email', 'password'])
+
+  User.findByCredentials(body.email, body.password).then((user) => {
+    return user.generateAuthToken().then((token) => {
+      res.cookie('token', token).send(user)
+    })
+  }).catch((err) => {
+    res.status(400).send('Invalid Login Credentials')
+  })
 })
 
 // Start Server

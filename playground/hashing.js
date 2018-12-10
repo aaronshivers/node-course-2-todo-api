@@ -1,15 +1,15 @@
-const jwt = require('jsonwebtoken')
+// const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
 const saltRounds = 10
 
-const password = 'pass123'
+const password = '12341234'
 
 bcrypt.hash(password, saltRounds, (err, hash) => {
   console.log(hash)
 })
 
-const hashedPassword = '$2b$10$UQemeOC.x0m/zkV73glgXusoJnJyndmzsxTy9ruSVCEVGf8h9m6Ay'
+const hashedPassword = '$2b$10$aO4rb4dQaXLTlYk6YGafzOhex24EdoBoWoIe9RykKw9Z6wWE7l.7a'
 
 bcrypt.compare(password, hashedPassword, (err, res) => {
   console.log(res)
