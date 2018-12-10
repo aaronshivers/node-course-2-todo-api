@@ -8,47 +8,47 @@ const userOneId = new ObjectId()
 const userTwoId = new ObjectId()
 
 const users = [{
-	_id: userOneId,
-	email: 'testuser1@test.com',
-	password: 'user1pass',
-	tokens: [{
-		access: 'auth',
-		token: jwt.sign({_id: userOneId, access: 'auth'}, process.env.JWT_SECRET).toString() 
-	}]
+  _id: userOneId,
+  email: 'testuser1@test.com',
+  password: 'user1pass',
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({_id: userOneId, access: 'auth'}, process.env.JWT_SECRET).toString() 
+  }]
 }, {
-	_id: userTwoId,
-	email: 'testuser2@test.com',
-	password: 'user2pass'
+  _id: userTwoId,
+  email: 'testuser2@test.com',
+  password: 'user2pass'
 }]
 
 const todos = [{
-	_id: new ObjectId(),
-	text: 'First Test Todo'
+  _id: new ObjectId(),
+  text: 'First Test Todo'
 }, {
-	_id: new ObjectId(),
-	text: 'Second Test Todo',
-	completed: true,
-	completedAt: 333
+  _id: new ObjectId(),
+  text: 'Second Test Todo',
+  completed: true,
+  completedAt: 333
 }]
 
 const populateTodos = (done) => {
-	Todo.remove({}).then(() => {
-		return Todo.insertMany(todos)
-	}).then(() => done())
+  Todo.remove({}).then(() => {
+    return Todo.insertMany(todos)
+  }).then(() => done())
 }
 
 const populateUsers = (done) => {
-	User.remove({}).then(() => {
-		const userOne = new User(users[0]).save()
-		const userTwo = new User(users[1]).save()
+  User.remove({}).then(() => {
+    const userOne = new User(users[0]).save()
+    const userTwo = new User(users[1]).save()
 
-		return Promise.all([userOne, userTwo])
-	}).then(() => done())
+    return Promise.all([userOne, userTwo])
+  }).then(() => done())
 }
 
 module.exports = {
-	todos,
-	populateTodos,
-	users,
-	populateUsers
+  todos,
+  populateTodos,
+  users,
+  populateUsers
 }

@@ -6,18 +6,18 @@ const saltRounds = 10
 const password = 'pass123'
 
 bcrypt.hash(password, saltRounds, (err, hash) => {
-	console.log(hash)
+  console.log(hash)
 })
 
 const hashedPassword = '$2b$10$UQemeOC.x0m/zkV73glgXusoJnJyndmzsxTy9ruSVCEVGf8h9m6Ay'
 
 bcrypt.compare(password, hashedPassword, (err, res) => {
-	console.log(res)
+  console.log(res)
 })
 
 // const data = {
-// 	id: 4,
-// 	color: 'red'
+//   id: 4,
+//   color: 'red'
 // }
 
 // const payload = data
