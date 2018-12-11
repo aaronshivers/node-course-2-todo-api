@@ -4,8 +4,6 @@ require('./config/config')
 const  _ = require('lodash')
 const  express = require('express')
 const  cookieParser = require('cookie-parser')
-const  bcrypt = require('bcrypt')
-const  jwt = require('jsonwebtoken')
 
 const  {ObjectId} = require('mongodb')
 const  {mongoose} = require('./db/mongoose')
