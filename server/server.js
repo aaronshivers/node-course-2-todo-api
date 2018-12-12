@@ -1,20 +1,21 @@
-// require('dotenv').config()
 require('./config/config')
 
-const  _ = require('lodash')
-const  express = require('express')
-const  cookieParser = require('cookie-parser')
+const _ = require('lodash')
+const express = require('express')
+const helmet = require('helmet')
+const cookieParser = require('cookie-parser')
 
-const  {ObjectId} = require('mongodb')
-const  {mongoose} = require('./db/mongoose')
-const  {Todo} = require('./models/todo')
-const  {User} = require('./models/user')
-const  {authenticate} = require('./middleware/authenticate')
+const {ObjectId} = require('mongodb')
+const {mongoose} = require('./db/mongoose')
+const {Todo} = require('./models/todo')
+const {User} = require('./models/user')
+const {authenticate} = require('./middleware/authenticate')
 
-const  app = express()  
-const  port = process.env.PORT
+const app = express()
+const port = process.env.PORT
 
 // App Config
+app.use(helmet())
 app.use(express.json())
 app.use(cookieParser())
 
