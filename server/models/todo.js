@@ -4,7 +4,6 @@ const Todo = mongoose.model('Todo', {
   text: {
     type: String,
     required: true,
-    unique: true,
     minlength: 1,
     trim: true
   },
@@ -15,6 +14,11 @@ const Todo = mongoose.model('Todo', {
   completedAt: {
     type: Date,
     default: null
+  },
+  _creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    // ref: 'User',
+    required: true
   }
 })
 

@@ -14,9 +14,11 @@ beforeEach(populateTodos)
 describe('POST /todos', () => {
   it('should create a new todo', (done) => {
     const text = 'Test todo text'
+    const cookie = `token=${users[0].tokens[0].token}`
 
     request(app)
       .post('/todos')
+      .set('Cookie', cookie)
       .send({ text })
       .expect(200)
       .expect((res) => {
@@ -36,9 +38,11 @@ describe('POST /todos', () => {
   })
 
   it('should not create todo with invalid body data', (done) => {
+    const cookie = `token=${users[0].tokens[0].token}`
 
     request(app)
       .post('/todos')
+      .set('Cookie', cookie)
       .send({})
       .expect(400)
       .end((err, res) => {
@@ -57,11 +61,14 @@ describe('POST /todos', () => {
 // GET all todos
 describe('GET /todos', () => {
   it('should get all todos', (done) => {
+    const cookie = `token=${users[0].tokens[0].token}`
+
     request(app)
       .get('/todos')
+      .set('Cookie', cookie)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(2)
+        expect(res.body.todos.length).toBe(1)
       })
       .end(done)
   })
@@ -69,9 +76,12 @@ describe('GET /todos', () => {
 
 // GET todo by Id
 describe('GET /todos/:id', () => {
+  const cookie = `token=${users[0].tokens[0].token}`
+
   it('should return todo doc', (done) => {
     request(app)
       .get(`/todos/${todos[0]._id.toHexString()}`)
+      .set('Cookie', cookie)
       .expect(200)
       .expect((res) => {
         expect(res.body.todo.text).toBe(todos[0].text)
@@ -79,11 +89,19 @@ describe('GET /todos/:id', () => {
       .end(done)
   })
 
+  it('should not return todo doc created by other user', (done) => {
+    request(app)
+      .get(`/todos/${todos[1]._id.toHexString()}`)
+      .set('Cookie', cookie)
+      .expect(404)
+      .end(done)
+  })
+
   it('should return 404 if todo not found', (done) => {
     const hexId = new ObjectId().toHexString()
-
     request(app)
       .get(`/todos/${hexId}`)
+      .set('Cookie', cookie)
       .expect(404)
       .end(done)
   })
@@ -91,6 +109,7 @@ describe('GET /todos/:id', () => {
   it('should return 404 for non-object Ids', (done) => {
     request(app)
       .get('/todos/fakeId')
+      .set('Cookie', cookie)
       .expect(404)
       .end(done)
   })
@@ -98,11 +117,14 @@ describe('GET /todos/:id', () => {
 
 // Delete by Id
 describe('DELETE /todos/:id', () => {
+  const cookie = `token=${users[1].tokens[0].token}`
+  
   it('should remove a todo', (done) => {
     const hexId = todos[1]._id.toHexString()
 
     request(app)
       .delete(`/todos/${hexId}`)
+      .set('Cookie', cookie)
       .expect(200)
       .expect((res) => {
         expect(res.body.todo._id).toBe(hexId)
@@ -119,9 +141,29 @@ describe('DELETE /todos/:id', () => {
       })
   })
 
+  it('should not remove a todo if created by other user', (done) => {
+    const hexId = todos[0]._id.toHexString()
+
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .set('Cookie', cookie)
+      .expect(404)
+      .end((err, res) => {
+        if (err) {
+          return done(err)
+        }
+
+        Todo.findById(hexId).then((todo) => {
+          expect(todo).toBeTruthy()
+          done()
+        }).catch((err) => done(err))
+      })
+  })
+
   it('should return 404 if todo not found', (done) => {
     request(app)
       .delete('/todos/fakeId')
+      .set('Cookie', cookie)
       .expect(404)
       .end(done)
   })
@@ -129,6 +171,7 @@ describe('DELETE /todos/:id', () => {
   it('should return 404 if ObjectId is invalid', (done) => {
     request(app)
       .delete('/todos/fakeId')
+      .set('Cookie', cookie)
       .expect(404)
       .end(done)
   })
@@ -136,12 +179,15 @@ describe('DELETE /todos/:id', () => {
 
 // Patch Todo
 describe('PATCH /todos/:id', () => {
+  const cookie = `token=${users[0].tokens[0].token}`
+
   it('should update the todo', (done) => {
     const hexId = todos[0]._id.toHexString()
     const text = 'first updated todo'
 
     request(app)
       .patch(`/todos/${hexId}`)
+      .set('Cookie', cookie)
       .send({
         completed: true,
         text
@@ -155,12 +201,28 @@ describe('PATCH /todos/:id', () => {
       .end(done)
   })
 
-  it('should clear completedAt when todo is incomplete', (done) => {
+  it('should not update the todo, if created by other user', (done) => {
     const hexId = todos[1]._id.toHexString()
+    const text = 'first updated todo'
+
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .set('Cookie', cookie)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(404)
+      .end(done)
+  })
+
+  it('should clear completedAt when todo is incomplete', (done) => {
+    const hexId = todos[0]._id.toHexString()
     const text = 'second updated todo'
 
     request(app)
       .patch(`/todos/${hexId}`)
+      .set('Cookie', cookie)
       .send({
         completed: false,
         text
@@ -178,9 +240,12 @@ describe('PATCH /todos/:id', () => {
 // return authenticated user
 describe('GET /users/me', () => {
   it('should return user if authenticated', (done) => {
+    const cookie = `token=${users[0].tokens[0].token}`
+
+
     request(app)
       .get('/users/me')
-      .set('Cookie', `token=${users[0].tokens[0].token}`)
+      .set('Cookie', cookie)
       .expect(200)
       .expect((res) => {
         expect(res.body._id).toBe(users[0]._id.toHexString())
@@ -271,7 +336,7 @@ describe('POST /users/login', () => {
 
         User.findById(users[1]._id).then((user) => {
           expect(user.tokens[0]).toHaveProperty('access', 'auth')
-          expect(user.tokens[0]).toHaveProperty('token')
+          expect(user.tokens[1]).toHaveProperty('token')
           done()
         }).catch((err) => done(err))
       })
@@ -295,7 +360,7 @@ describe('POST /users/login', () => {
         }
 
         User.findOne({email: 'testuser2@test.com'}).then((user) => {
-          expect(user.tokens.length).toBe(0)
+          expect(user.tokens.length).toBe(1)
           done()
         }).catch((err) => done(err))
       })
@@ -304,10 +369,10 @@ describe('POST /users/login', () => {
 
 describe('DELETE /users/me/token', () => {
   it('should remove auth token on logout', (done) => {
-    const token = users[0].tokens[0].token
+    const cookie = `token=${users[0].tokens[0].token}`
     request(app)
       .delete('/users/me/token')
-      .set('Cookie', `token=${token}`)
+      .set('Cookie', cookie)
       .expect(200)
       .end((err, res) => {
         if (err) {
