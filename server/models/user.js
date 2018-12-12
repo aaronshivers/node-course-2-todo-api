@@ -3,7 +3,6 @@ const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 const bcrypt = require('bcrypt')
-// const {Todo}   = require('../models/todo')
 const saltingRounds = 10
 
 const userSchema = new mongoose.Schema({
@@ -34,11 +33,6 @@ const userSchema = new mongoose.Schema({
       required: true
     }
   }]
-  // todos: [{
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'Todo',
-  //   unique: true
-  // }]
 })
 
 userSchema.methods.toJSON = function () {
