@@ -122,9 +122,7 @@ app.post('/users', (req, res) => {
   user.save().then(() => {
     return user.generateAuthToken()
   }).then((token) => {
-    // res.header('x-auth', token).send(user)
     res.cookie('token', token).send(user)
-    // console.log(req.cookies.token)
   }).catch((err) => {
     res.status(400).send(err)
   })
@@ -145,6 +143,15 @@ app.post('/users/login', (req, res) => {
     })
   }).catch((err) => {
     res.status(400).send('Invalid Login Credentials')
+  })
+})
+
+// Logout
+app.delete('/users/me/token', authenticate , (req, res) => {
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send()
+  }, () => {
+    res.status(400).send()
   })
 })
 
