@@ -1,4 +1,4 @@
-require('dotenv').config()
+// require('dotenv').config()
 require('./config/config')
 
 const  _ = require('lodash')
