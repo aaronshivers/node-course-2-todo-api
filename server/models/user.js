@@ -51,7 +51,7 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(payload, secret, options).toString()
 
   user.tokens.push({access, token})
-  // user.tokens = user.tokens.concat([{access, token}])
+  user.tokens = user.tokens.concat([{access, token}])
 
   return user.save().then(() => {
     return token
